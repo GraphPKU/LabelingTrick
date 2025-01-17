@@ -1,7 +1,3 @@
-# CUDA_VISIBLE_DEVICES=0 nohup python seal.py --dataset ogbl-collab --num_hops 1 --train_percent 15 --hidden_channels 256 --node_label dizo --model PGIN > collab.dizo.pgin.ln.test &
-# CUDA_VISIBLE_DEVICES=1 nohup python seal.py --dataset ogbl-ddi  --hidden_channels 96  --lr 0.0001 --num_hops 1 --ratio_per_hop 0.2 --use_edge_weight --eval_steps 1 --epochs 10 --dynamic_val --dynamic_test --train_percent 1 --node_label dizo --model PGIN > ddi.Plabel.test &
-# CUDA_VISIBLE_DEVICES=1 nohup python seal.py --dataset ogbl-citation2 --num_hops 1 --use_feature --use_edge_weight --eval_steps 1 --epochs 10 --dynamic_train --dynamic_val --dynamic_test --train_percent 2 --val_percent 1 --test_percent 1 --node_label dizo --model PGIN > citation.dizo.pgin.test &
-# python seal.py --dataset ogbl-ppa --num_hops 1 --use_feature --use_edge_weight --eval_steps 5 --epochs 20 --dynamic_train --dynamic_val --dynamic_test --train_percent 5 --node_label dide --model PGIN
 # Copyright (c) Facebook, Inc. and its affiliates.
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
@@ -308,10 +304,14 @@ def k_hop_subgraph(src,
         fringe = fringe - visited
         visited = visited.union(fringe)
         if sample_ratio < 1.0:
+            fringe = sorted(fringe)
             fringe = random.sample(fringe, int(sample_ratio * len(fringe)))
+            fringe = set(fringe)
         if max_nodes_per_hop is not None:
             if max_nodes_per_hop < len(fringe):
+                fringe = sorted(fringe)
                 fringe = random.sample(fringe, max_nodes_per_hop)
+                fringe = set(fringe)
         if len(fringe) == 0:
             break
         nodes = nodes + list(fringe)
