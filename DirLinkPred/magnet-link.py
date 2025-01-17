@@ -30,12 +30,14 @@ dataset_name = args.dataset.split('/')
 data = load_directed_real_data(dataset=dataset_name[0],
                                root=path,
                                name=dataset_name[1]).to(device)
+
 link_data = link_class_split(data,
                              prob_val=0.05,
                              prob_test=0.15,
                              splits=10,
                              task=args.task, #"existence",
-                             device=device)
+                             device=device,
+                             maintain_connect=False)
 criterion = nn.NLLLoss()
 
 
@@ -63,7 +65,7 @@ def work(hid_dim, layer, lr, batch_size, **kwargs):
                              device=tqe.device,
                              dtype=torch.long)
             ty[tqe.shape[0]:] = 1
-            X_real = in_out_degree(tei, size=len(data.x)).to(device)
+            X_real = in_out_degree(tei, X_real.shape[0]).to(device)
             X_img = X_real
             out = model(X_real, X_img, tei, torch.cat((tqe, tneg)), None)
             loss = criterion(out, ty)
@@ -108,7 +110,7 @@ def work(hid_dim, layer, lr, batch_size, **kwargs):
         edge_weight = link_data[split]['weights']
         query_edges = link_data[split]['train']['edges']
         y = link_data[split]['train']['label']
-        X_real = in_out_degree(edge_index, size=len(data.x)).to(device)
+        X_real = in_out_degree(edge_index).to(device)
         X_img = X_real.clone()
 
         query_val_edges = link_data[split]['val']['edges']
@@ -131,7 +133,7 @@ def work(hid_dim, layer, lr, batch_size, **kwargs):
                                  edge_weight, query_test_edges)
                 print(f'Split: {split:02d}, Test_Acc: {tst_score:.4f}')
         print(f'Split: {split:02d}, Final Test_Acc: {tst_score:.4f}')
-        rec.append(tst_score)
+        rec.append(best_val)
 
     print(f"average {np.average(rec)} pm {np.std(rec)}")
     return np.average(rec)

@@ -318,6 +318,7 @@ class GIN_link_prediction_labelingtrick(nn.Module):
             * log_prob (PyTorch Float Tensor) - Logarithmic class probabilities for all nodes, with shape (num_nodes, num_classes).
         """
         real = self.inputlin_real(real)
+        # print("real", real.shape)
         num_tar = query_edges.shape[0]
         idx = torch.arange(num_tar, device=real.device)
         real = real.unsqueeze(0).repeat(num_tar, 1, 1)
