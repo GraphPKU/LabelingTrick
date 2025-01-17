@@ -265,16 +265,6 @@ def test(pool="mean",
 
 
 print(args)
-# read configuration
-'''
-with open(f"config/{args.dataset}.yml") as f:
-    params = yaml.safe_load(f)
-
-print("params", params, flush=True)
-split()
-test(**(params))
-'''
-
 import optuna
 
 
